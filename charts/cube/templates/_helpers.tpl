@@ -321,3 +321,12 @@ runAsUser: {{ .uid }}
     name: {{ template "git_sync_known_hosts" . }}
     defaultMode: 288
 {{- end }}
+
+
+{{- define "schema_path" -}}
+  {{- if .Values.config.gitSync.enabled }}
+    {{- printf "%s/repo/%s" .Values.config.schemaPath .Values.config.gitSync.subPath }}
+  {{- else }}
+    {{- printf "%s" .Values.config.schemaPath }}
+  {{- end }}
+{{- end }}
