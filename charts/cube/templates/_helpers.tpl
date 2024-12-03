@@ -168,7 +168,7 @@ runAsUser: {{ .uid }}
 {{/*  Git sync container */}}
 {{- define "git_sync_container" }}
 - name: {{ .Values.config.gitSync.containerName }}{{ if .is_init }}-init{{ end }}
-  image: {{- printf "%s:%s" .Values.config.gitSync.image.repository .Values.config.gitSync.image.tag }}
+  image: {{ printf "%s:%s" .Values.config.gitSync.image.repository .Values.config.gitSync.image.tag }}
   imagePullPolicy: {{ .Values.config.gitSync.image.pullPolicy }}
   securityContext: {{- include "localContainerSecurityContext" .Values.config.gitSync | nindent 4 }}
   envFrom: {{- include "custom_git_sync_environment_from" . | default "\n  []" | indent 2 }}

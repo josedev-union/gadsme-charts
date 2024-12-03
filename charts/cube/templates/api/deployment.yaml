@@ -40,13 +40,13 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.config.initContainers }}
       initContainers:
-        {{- if and .Values.dags.gitSync.enabled (not .Values.dags.persistence.enabled) }}
-        {{- include "git_sync_container" (dict "Values" .Values "is_init" "true" "Template" .Template) | nindent 8 }}
+        {{- if and .Values.config.gitSync.enabled }}
+          {{- include "git_sync_container" (dict "Values" .Values "is_init" "true" "Template" .Template) | nindent 8 }}
         {{- end }}
-        {{- toYaml .Values.config.initContainers | nindent 8 }}
-      {{- end }}
+        {{- if .Values.config.initContainers }}
+          {{- toYaml .Values.config.initContainers | nindent 8 }}
+        {{- end }}
       containers:
         - name: cube
           {{- if .Values.image.tag }}
@@ -146,17 +146,17 @@ spec:
       topologySpreadConstraints:
         {{- toYaml .Values.api.spreadConstraints | nindent 8 }}
       {{- end }}
-      {{- if .Values.config.volumes }}
       volumes:
         {{- if .Values.config.gitSync.enabled }}
         - name: schemas
-          emptyDir: {{- toYaml (default (dict) .Values.config.gitSync.emptyDirConfig) | nindent 6 }}
+          emptyDir: {{- toYaml (default (dict) .Values.config.gitSync.emptyDirConfig) | nindent 12 }}
         {{- end }}
-        {{- if and  .Values.config.gitSync.enabled  .Values.config.gitSync.sshKeySecret }}
-        {{- include "git_sync_ssh_key_volume" . | nindent 8 }}
+        {{- if and .Values.config.gitSync.enabled (or .Values.config.gitSync.sshKeySecret .Values.config.gitSync.sshKey) }}
+          {{- include "git_sync_ssh_key_volume" . | nindent 8 }}
         {{- end }}
         {{- if and  .Values.config.gitSync.enabled  .Values.config.gitSync.knownHosts }}
-        {{- include "git_sync_known_hosts_volume" . | nindent 8 }}
+          {{- include "git_sync_known_hosts_volume" . | nindent 8 }}
         {{- end }}
-        {{- toYaml .Values.config.volumes | nindent 8 }}
-      {{- end }}
+        {{- if .Values.config.volumes }}
+          {{- toYaml .Values.config.volumes | nindent 8 }}
+        {{- end }}
